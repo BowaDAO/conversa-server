@@ -34,7 +34,7 @@ app.use(sessionMiddleware);
 app.set("trust proxy", 1);
 
 app.use("/favicon.ico", (req, res) => res.status(204).end());
-app.use("/auth", authRouter);
+app.use("auth", authRouter);
 
 io.use(wrapper(sessionMiddleware));
 
