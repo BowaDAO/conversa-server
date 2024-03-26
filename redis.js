@@ -1,6 +1,6 @@
-// const Redis = require("ioredis");
+require("dotenv").config();
 const { createClient } = require("redis");
 
-let redisClient = createClient();
+let redisClient = createClient(process.env.REDIS_URL);
 
 module.exports = redisClient;
