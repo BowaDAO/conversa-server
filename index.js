@@ -18,7 +18,7 @@ const {
   addFriend,
   onDisconnect,
 } = require("./controllers/socketio");
-const server = require("http").createServer(app);
+const server = require("node:http").createServer(app);
 
 redisClient.on("error", (err) => console.log(err)).connect();
 
@@ -51,8 +51,6 @@ io.on("connect", (socket) => {
 
   socket.on("disconnecting", () => onDisconnect(socket));
 });
-
-console.log(process.env.CLIENT_URL);
 
 const port = process.env.PORT || 4000;
 

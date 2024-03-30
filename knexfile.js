@@ -12,7 +12,6 @@ module.exports = {
       password: process.env.DATABASE_PASSWORD,
       host: process.env.DATABASE_HOST,
       port: Number(process.env.DATABASE_PORT),
-      ssl: false,
     },
     migrations: {
       tableName: "migrations",
@@ -27,7 +26,6 @@ module.exports = {
       password: process.env.STAGING_DATABASE_PASSWORD,
       host: process.env.DATABASE_HOST,
       port: Number(process.env.DATABASE_PORT),
-      ssl: false,
     },
     pool: {
       min: 2,
@@ -46,7 +44,6 @@ module.exports = {
       password: process.env.PRODUCTION_DATABASE_PASSWORD,
       host: process.env.DATABASE_HOST,
       port: Number(process.env.DATABASE_PORT),
-      ssl: false,
     },
     pool: {
       min: 2,
