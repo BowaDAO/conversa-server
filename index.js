@@ -20,9 +20,7 @@ const {
 } = require("./controllers/socketio");
 const server = require("http").createServer(app);
 
-// redisClient.connect({}).catch((error) => {
-//   console.log(error);
-// });
+redisClient.on("error", (err) => console.log(err)).connect();
 
 const io = new Server(server, {
   cors: corsOption,

@@ -10,8 +10,6 @@ const redisOptions = {
   },
 };
 
-let redisClient = createClient(
-  process.env.NODE_ENV === "production" ? redisOptions : {}
-).connect();
+let redisClient = createClient({ url: process.env.REDIS_URL });
 
 module.exports = redisClient;
