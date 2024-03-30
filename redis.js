@@ -10,6 +10,6 @@ const redisOptions = {
   },
 };
 
-let redisClient = createClient({ url: process.env.REDIS_URL });
+let redisClient = createClient(redisOptions);
 
 module.exports = redisClient;
