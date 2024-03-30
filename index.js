@@ -34,7 +34,7 @@ app.use(sessionMiddleware);
 app.set("trust proxy", 1);
 
 app.use("/favicon.ico", (req, res) => res.status(204).end());
-app.use("auth", authRouter);
+app.use("/auth", authRouter);
 
 io.use(wrapper(sessionMiddleware));
 
@@ -51,6 +51,8 @@ io.on("connect", (socket) => {
 
   socket.on("disconnecting", () => onDisconnect(socket));
 });
+
+console.log(process.env.CLIENT_URL);
 
 const port = process.env.PORT || 4000;
 
