@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const { Server } = require("socket.io");
+const { createServer } = require("node:http");
 const helmet = require("helmet");
 const cors = require("cors");
 const authRouter = require("./routes/auth");
@@ -14,7 +15,8 @@ const {
   addFriend,
   onDisconnect,
 } = require("./controllers/socketio");
-const server = require("node:http").createServer(app);
+
+const server = createServer(app);
 
 redisClient.on("error", (err) => console.log(err)).connect();
 
@@ -30,10 +32,8 @@ app.set("trust proxy", 1);
 app.use("/auth", authRouter);
 io.use(authorizeUser);
 
-io.on("connect", (socket) => {
+io.on("connection", (socket) => {
   initializeUser(socket);
-
-  console.log(socket.connected());
 
   socket.on("add_friend", (friendName, cb) => {
     addFriend(socket, friendName, cb);
