@@ -13,8 +13,9 @@ module.exports = {
       host: process.env.DATABASE_HOST,
       port: Number(process.env.DATABASE_PORT),
     },
-    migrations: {
-      tableName: "migrations",
+    pool: {
+      min: 2,
+      max: 10,
     },
   },
 

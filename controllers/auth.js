@@ -6,6 +6,7 @@ const {
   userExistsQuery,
   loginQuery,
 } = require("../postgres-queries");
+const { jwtSign, jwtVerify } = require("../utilities/jwtAuth");
 
 const signin = async (req, res) => {
   const { username, password } = req.body;
@@ -31,16 +32,23 @@ const signin = async (req, res) => {
         .json({ loggedIn: false, message: "Incorrect password." });
     }
 
-    req.session.user = {
-      username,
-      userid: user.rows[0].userid,
-    };
+    jwtSign(
+      {
+        username: req.body.username,
+        id: user.rows[0].id,
+        userid: user.rows[0].userid,
+      },
 
-    return res.json({ loggedIn: true, username, userid: user.rows[0].userid });
+      process.env.JWT_SECRET,
+
+      { expiresIn: "2d" }
+    ).then((token) => {
+      res.json({ loggedIn: true, token });
+    });
   } catch (error) {
     return res
       .status(400)
-      .json({ message: "Something went wrong, try again." });
+      .json({ loggedIn: false, message: "Something went wrong, try again." });
   }
 };
 
@@ -59,16 +67,23 @@ const signup = async (req, res) => {
         uuidv4(),
       ]);
 
-      req.session.user = {
-        username,
-        userid: newUser.rows[0].userid,
-      };
+      jwtSign(
+        {
+          username: req.body.username,
+          id: newUser.rows[0].id,
+          userid: newUser.rows[0].userid,
+        },
 
-      return res.json({
-        loggedIn: true,
-        username,
-        userid: newUser.rows[0].userid,
-      });
+        process.env.JWT_SECRET,
+
+        { expiresIn: "2d" }
+      )
+        .then((token) => {
+          res.json({ loggedIn: true, token });
+        })
+        .catch((error) => {
+          res.json({ loggedIn: false, token });
+        });
     } else {
       return res
         .status(409)
@@ -82,15 +97,19 @@ const signup = async (req, res) => {
 };
 
 const handleSession = async (req, res) => {
-  if (req.session.user && req.session.user.username) {
-    return res.json({
-      loggedIn: true,
-      username: req.session.user.username,
-      userid: req.session.user.userid,
-    });
-  } else {
-    return res.json({ loggedIn: false });
+  const token = req.headers["authorization"]?.split(" ")[1];
+
+  if (!token) {
+    res.json({ loggedIn: false });
   }
+
+  jwtVerify(token, process.env.JWT_SECRET)
+    .then((decodedToken) => {
+      res.json({ loggedIn: true, decodedToken });
+    })
+    .catch((error) => {
+      res.json({ loggedIn: false });
+    });
 };
 
 module.exports = { signin, signup, handleSession };

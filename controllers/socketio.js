@@ -1,17 +1,22 @@
 const redisClient = require("../redis");
+const { jwtVerify } = require("../utilities/jwtAuth");
 
 const authorizeUser = (socket, next) => {
-  if (!socket.request.session || !socket.request.session.user) {
-    next(new Error("Not authorized"));
-  } else {
-    next();
-  }
+  const token = socket.handshake.auth.token;
+
+  if (token)
+    jwtVerify(token, process.env.JWT_SECRET)
+      .then((decodedToken) => {
+        socket.user = { ...decodedToken };
+        next();
+      })
+      .catch((error) => {
+        next(new Error("Not authorized"));
+      });
 };
 
 const initializeUser = async (socket) => {
-  socket.user = { ...socket.request.session.user };
-
-  socket.join(socket.user.userid);
+  socket.join(socket?.user.userid);
 
   await redisClient.hSet(
     `userid:${socket.user.username}`,
@@ -121,7 +126,9 @@ const onDisconnect = async (socket) => {
 
   const friendRooms = parsedFriendList.map((friend) => friend.userid);
 
-  socket.to(friendRooms).emit("connected", "false", socket.user.username);
+  if (friendRooms.length > 0) {
+    socket.to(friendRooms).emit("connected", "false", socket.user.username);
+  }
 };
 
 const parseFriendList = async (friendList) => {
