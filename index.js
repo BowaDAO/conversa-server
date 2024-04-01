@@ -22,6 +22,8 @@ const server = require("node:http").createServer(app);
 
 redisClient.on("error", (err) => console.log(err)).connect();
 
+console.log(redisClient.isReady, redisClient.isOpen);
+
 const io = new Server(server, {
   cors: corsOption,
 });
